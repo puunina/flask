@@ -46,6 +46,10 @@ def market_page():
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
     form = RegisterForm()
+
+    '''
+    if user is validated we assign given data to our arguments in datadatabase
+    '''
     if form.validate_on_submit():
         user_to_create = User(username=form.username.data,
                               email_address=form.email_address.data,
@@ -55,7 +59,8 @@ def register_page():
         login_user(user_to_create)
         flash(f"Account created successfully! You are now logged in as {user_to_create.username}", category='success')
         return redirect(url_for('market_page'))
-    if form.errors != {}: #If there are not errors from the validations
+
+    if form.errors != {}: #If there are errors from the validations
         for err_msg in form.errors.values():
             flash(f'There was an error with creating a user: {err_msg}', category='danger')
 
@@ -64,8 +69,8 @@ def register_page():
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     form = LoginForm()
-    if form.validate_on_submit():
-        attempted_user = User.query.filter_by(username=form.username.data).first()
+    if form.validate_on_submit(): # checks if information is valid and if user clicked button
+        attempted_user = User.query.filter_by(username=form.username.data).first() # checks if user exists
         if attempted_user and attempted_user.check_password_correction(
                 attempted_password=form.password.data
         ):
